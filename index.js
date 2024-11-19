@@ -83,6 +83,35 @@ const client = new MongoClient(uri, {
         res.send(result)
      }) 
 
+    //  all products
+    app.get( '/all-products' , async( req, res )=>{
+      const {title, sort, brand, category} = req.query
+      const query = {}
+
+      if(title){
+        query.title ={ $regex:title , $options: 'i'}
+      }
+      if(category){
+        query.category ={ $regex:category , $options: 'i'}
+      }
+      if(brand){
+        query.brand = brand
+      }
+
+      const sortOptions = sort === 'asc' ? -1 : 1
+
+      const products = await allProduct.find(query).sort({price: sortOptions}).toArray()
+
+      const productInfo = await allProduct.find({}, { projection:{ category:1 , brand: 1}}).toArray();
+
+      const totalProduct = await allProduct.countDocuments(query)
+
+      const brands = [...new Set(productInfo.map((product)=> product.brand ))]
+      const categories = [...new Set(productInfo.map((product)=> product.category ))]
+
+      res.send({products, brands, categories, totalProduct})
+    })
+
 
     }
     catch(error){
