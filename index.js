@@ -16,7 +16,7 @@ app.use(express.json())
 
 // token verification 
 const verifyJwt =(req, res , next) =>{
-  const authorization = req.header.authorization
+  const authorization = req.headers.authorization
   if( !authorization ){
     return res.send({ message: "No token found"})
   }
@@ -77,7 +77,7 @@ const client = new MongoClient(uri, {
       })
 
       // Add Product
-     app.post('/add-product',verifyJwt, verifySeller, async( req, res )=>{
+     app.post('/add-products',verifyJwt, verifySeller, async( req, res )=>{
         const product = req.body
         const result = await allProduct.insertOne(product)
         res.send(result)
